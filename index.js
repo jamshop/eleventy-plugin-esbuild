@@ -4,12 +4,11 @@ const esBuildTransform = require("./transform");
 const esBuildShortcode = require("./shortcode");
 const path = require("path");
 
-const compileEsBuildTargets = (targets, esBuildOptions) => {
+const compileEsBuildTargets = (targets, output, esbuild={}) => {
   // targets:
   // [{ main: "/path/to.js"}]
 
   const files = Object.entries(targets); // [["main","path/to.js"], ...]
-
 
   // Note: ES build doesn't provide a way to get bundle information so
   // we can't add the bundled files as watch targets
@@ -17,12 +16,19 @@ const compileEsBuildTargets = (targets, esBuildOptions) => {
   for (let index = 0; index < files.length; index++) {
     const key = files[index][0];
     const file = files[index][1];
+
+    let outfile = undefined;
+    if(output) {
+      outfile = path.join(output, `${key}.js`);
+    }
+
     const res = buildSync({
       entryPoints: [file],
       minify: process.NODE_ENV === "development" ? false : true,
       bundle: true,
-      write: false,
-      ...esBuildOptions
+      write: output ? true : false,
+      outfile,
+      ...esbuild
     });
     if(res.outputFiles) {
       data[key] = new TextDecoder("utf-8").decode(res.outputFiles[0].contents);
@@ -31,7 +37,7 @@ const compileEsBuildTargets = (targets, esBuildOptions) => {
   return data;
 };
 
-const esBuildPlugin = (eleventyConfig, { targets = {}, ...esBuildOptions } = {}) => {
+const esBuildPlugin = (eleventyConfig, { targets = {}, output, esbuild } = {}) => {
   if (Object.entries(targets).length === 0) {
     // Support older versions of 11ty
     if(eleventyConfig.addGlobalData) {
@@ -49,11 +55,11 @@ const esBuildPlugin = (eleventyConfig, { targets = {}, ...esBuildOptions } = {})
   if(eleventyConfig.addGlobalData) {
      addCachedGlobalData(
       eleventyConfig,
-      () => compileEsBuildTargets(targets, esBuildOptions),
+      () => compileEsBuildTargets(targets, output, esbuild),
       "esbuild"
     );
   } else {
-    compileEsBuildTargets(targets, esBuildOptions);
+    compileEsBuildTargets(targets, output, esbuild);
   }
 
   // Ideally we'd add a watch for each assets consumed by the entry but as yet I don't think that can be done with esbuild

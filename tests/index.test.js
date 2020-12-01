@@ -29,11 +29,12 @@ test("pluginEsbuild global data", (t) => {
 
 test("pluginEsbuild output js", (t) => {
   eleventyConfig.addPlugin(pluginEsbuild, {
-    targets: { main: require.resolve("./stubs/javascript.js") }, write: true, outdir: "./tests/stubs/_out"
+    targets: { "main-js": require.resolve("./stubs/javascript.js") },
+    output: "./tests/stubs/_out"
   });
   
   let content = fs.readFileSync(
-    "./tests/stubs/_out/javascript.js",
+    "./tests/stubs/_out/main-js.js",
     "utf-8"
   );
 
@@ -42,15 +43,16 @@ test("pluginEsbuild output js", (t) => {
 
 test("pluginEsbuild output preact", (t) => {
   eleventyConfig.addPlugin(pluginEsbuild, {
-    targets: { main: require.resolve("./stubs/preact.js") }, 
-    write: true, 
-    outdir: "./tests/stubs/_out",
-    loader: {".js": "jsx"},
-    jsxFactory: "h"
+    targets: { "main-preact": require.resolve("./stubs/preact.js") }, 
+    output: "./tests/stubs/_out",
+    esbuild: {
+      loader: {".js": "jsx"},
+      jsxFactory: "h"
+    }
   });
   
   let content = fs.readFileSync(
-    "./tests/stubs/_out/preact.js",
+    "./tests/stubs/_out/main-preact.js",
     "utf-8"
   );
   t.snapshot(content);
@@ -58,13 +60,12 @@ test("pluginEsbuild output preact", (t) => {
 
 test("pluginEsbuild output react", (t) => {
   eleventyConfig.addPlugin(pluginEsbuild, {
-    targets: { main: require.resolve("./stubs/react.jsx") }, 
-    write: true, 
-    outdir: "./tests/stubs/_out"
+    targets: { "main-react": require.resolve("./stubs/react.jsx") }, 
+    output: "./tests/stubs/_out",
   });
   
   let content = fs.readFileSync(
-    "./tests/stubs/_out/react.js",
+    "./tests/stubs/_out/main-react.js",
     "utf-8"
   );
   t.snapshot(content);
