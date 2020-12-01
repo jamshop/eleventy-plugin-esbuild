@@ -5,6 +5,7 @@ const eleventyConfig = require("@11ty/eleventy/src/EleventyConfig");
 const defaultConfig = require("@11ty/eleventy/src/defaultConfig.js");
 const TemplateRender = require("@11ty/eleventy/src/TemplateRender");
 const EleventyExtensionMap = require("@11ty/eleventy/src/EleventyExtensionMap");
+const fs = require("fs");
 
 function getNewTemplateRender(name, inputDir) {
   let tr = new TemplateRender(name, inputDir);
@@ -12,20 +13,67 @@ function getNewTemplateRender(name, inputDir) {
   return tr;
 }
 
-test("pluginEsbuild global data matches snapshot", (t) => {
+test("pluginEsbuild global data", (t) => {
   eleventyConfig.addPlugin(pluginEsbuild, {
-    targets: { main: require.resolve("./stub.js") },
+    targets: { main: require.resolve("./stubs/javascript.js") },
   });
   let cfg = new TemplateConfig(defaultConfig, "./config.js").getConfig();
-  t.not(Object.keys(cfg.globalData).indexOf("js"), -1);
-  const { js } = cfg.globalData;
-  t.snapshot(js);
+  if(cfg.globalData) {
+    t.not(Object.keys(cfg.globalData).indexOf("esbuild"), -1);
+    const { js } = cfg.globalData;
+    t.snapshot(js);
+  } else {
+    t.pass("No addGlobalData method available in 11ty.");
+  }
+});
+
+test("pluginEsbuild output js", (t) => {
+  eleventyConfig.addPlugin(pluginEsbuild, {
+    targets: { main: require.resolve("./stubs/javascript.js") }, write: true, outdir: "./tests/stubs/_out"
+  });
+  
+  let content = fs.readFileSync(
+    "./tests/stubs/_out/javascript.js",
+    "utf-8"
+  );
+
+  t.snapshot(content);
+});
+
+test("pluginEsbuild output preact", (t) => {
+  eleventyConfig.addPlugin(pluginEsbuild, {
+    targets: { main: require.resolve("./stubs/preact.js") }, 
+    write: true, 
+    outdir: "./tests/stubs/_out",
+    loader: {".js": "jsx"},
+    jsxFactory: "h"
+  });
+  
+  let content = fs.readFileSync(
+    "./tests/stubs/_out/preact.js",
+    "utf-8"
+  );
+  t.snapshot(content);
+});
+
+test("pluginEsbuild output react", (t) => {
+  eleventyConfig.addPlugin(pluginEsbuild, {
+    targets: { main: require.resolve("./stubs/react.jsx") }, 
+    write: true, 
+    outdir: "./tests/stubs/_out"
+  });
+  
+  let content = fs.readFileSync(
+    "./tests/stubs/_out/react.js",
+    "utf-8"
+  );
+  t.snapshot(content);
 });
 
 test("Handlebars javascript Shortcode", async (t) => {
   let tr = getNewTemplateRender("hbs");
   tr.engine.addPairedShortcodes({
-    javascript: pluginEsbuild.javascriptShortcode,
+    javascript: pluginEsbuild.esBuildShortcode,
   });
 
   let fn = await tr.getCompiledTemplate(

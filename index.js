@@ -10,6 +10,7 @@ const compileEsBuildTargets = (targets, esBuildOptions) => {
 
   const files = Object.entries(targets); // [["main","path/to.js"], ...]
 
+
   // Note: ES build doesn't provide a way to get bundle information so
   // we can't add the bundled files as watch targets
   const data = {};
@@ -23,12 +24,14 @@ const compileEsBuildTargets = (targets, esBuildOptions) => {
       write: false,
       ...esBuildOptions
     });
-    data[key] = new TextDecoder("utf-8").decode(res.outputFiles[0].contents);
+    if(res.outputFiles) {
+      data[key] = new TextDecoder("utf-8").decode(res.outputFiles[0].contents);
+    }
   }
   return data;
 };
 
-const esBuildPlugin = async (eleventyConfig, { targets = {}, esBuildOptions = {} } = {}) => {
+const esBuildPlugin = (eleventyConfig, { targets = {}, ...esBuildOptions } = {}) => {
   if (Object.entries(targets).length === 0) {
     // Support older versions of 11ty
     if(eleventyConfig.addGlobalData) {
@@ -44,7 +47,7 @@ const esBuildPlugin = async (eleventyConfig, { targets = {}, esBuildOptions = {}
  
  
   if(eleventyConfig.addGlobalData) {
-    await addCachedGlobalData(
+     addCachedGlobalData(
       eleventyConfig,
       () => compileEsBuildTargets(targets, esBuildOptions),
       "esbuild"
