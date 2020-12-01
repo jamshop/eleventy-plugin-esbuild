@@ -49,6 +49,8 @@ const esBuildPlugin = async (eleventyConfig, { targets = {}, esBuildOptions = {}
       () => compileEsBuildTargets(targets, esBuildOptions),
       "esbuild"
     );
+  } else {
+    compileEsBuildTargets(targets, esBuildOptions);
   }
 
   // Ideally we'd add a watch for each assets consumed by the entry but as yet I don't think that can be done with esbuild
