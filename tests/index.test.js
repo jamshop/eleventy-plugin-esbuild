@@ -15,7 +15,7 @@ function getNewTemplateRender(name, inputDir) {
 
 test("pluginEsbuild global data", (t) => {
   eleventyConfig.addPlugin(pluginEsbuild, {
-    targets: { main: require.resolve("./stubs/javascript.js") },
+    entryPoints: { main: require.resolve("./stubs/javascript.js") },
   });
   let cfg = new TemplateConfig(defaultConfig, "./config.js").getConfig();
   if(cfg.globalData) {
@@ -29,7 +29,7 @@ test("pluginEsbuild global data", (t) => {
 
 test("pluginEsbuild output js", (t) => {
   eleventyConfig.addPlugin(pluginEsbuild, {
-    targets: { "main-js": require.resolve("./stubs/javascript.js") },
+    entryPoints: { "main-js": require.resolve("./stubs/javascript.js") },
     output: "./tests/stubs/_out"
   });
   
@@ -43,7 +43,7 @@ test("pluginEsbuild output js", (t) => {
 
 test("pluginEsbuild output preact", (t) => {
   eleventyConfig.addPlugin(pluginEsbuild, {
-    targets: { "main-preact": require.resolve("./stubs/preact.js") }, 
+    entryPoints: { "main-preact": require.resolve("./stubs/preact.js") }, 
     output: "./tests/stubs/_out",
     esbuild: {
       loader: {".js": "jsx"},
@@ -60,7 +60,7 @@ test("pluginEsbuild output preact", (t) => {
 
 test("pluginEsbuild output react", (t) => {
   eleventyConfig.addPlugin(pluginEsbuild, {
-    targets: { "main-react": require.resolve("./stubs/react.jsx") }, 
+    entryPoints: { "main-react": require.resolve("./stubs/react.jsx") }, 
     output: "./tests/stubs/_out",
   });
   

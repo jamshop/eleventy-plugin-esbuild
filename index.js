@@ -4,11 +4,11 @@ const esBuildTransform = require("./transform");
 const esBuildShortcode = require("./shortcode");
 const path = require("path");
 
-const compileEsBuildTargets = (targets, output, esbuild={}) => {
-  // targets:
+const compileEsBuildTargets = (entryPoints, output, esbuild={}) => {
+  // entryPoints:
   // [{ main: "/path/to.js"}]
 
-  const files = Object.entries(targets); // [["main","path/to.js"], ...]
+  const files = Object.entries(entryPoints); // [["main","path/to.js"], ...]
 
   // Note: ES build doesn't provide a way to get bundle information so
   // we can't add the bundled files as watch targets
@@ -37,8 +37,8 @@ const compileEsBuildTargets = (targets, output, esbuild={}) => {
   return data;
 };
 
-const esBuildPlugin = (eleventyConfig, { targets = {}, output, esbuild } = {}) => {
-  if (Object.entries(targets).length === 0) {
+const esBuildPlugin = (eleventyConfig, { entryPoints = {}, output, esbuild } = {}) => {
+  if (Object.entries(entryPoints).length === 0) {
     // Support older versions of 11ty
     if(eleventyConfig.addGlobalData) {
       // return an empty object if no enteries
@@ -55,15 +55,15 @@ const esBuildPlugin = (eleventyConfig, { targets = {}, output, esbuild } = {}) =
   if(eleventyConfig.addGlobalData) {
      addCachedGlobalData(
       eleventyConfig,
-      () => compileEsBuildTargets(targets, output, esbuild),
+      () => compileEsBuildTargets(entryPoints, output, esbuild),
       "esbuild"
     );
   } else {
-    compileEsBuildTargets(targets, output, esbuild);
+    compileEsBuildTargets(entryPoints, output, esbuild);
   }
 
   // Ideally we'd add a watch for each assets consumed by the entry but as yet I don't think that can be done with esbuild
-  Object.entries(targets).forEach(([_, watchPath]) => {
+  Object.entries(entryPoints).forEach(([_, watchPath]) => {
     const relativePath = path.relative(process.cwd(), watchPath);
     eleventyConfig.addWatchTarget(relativePath);
   });
