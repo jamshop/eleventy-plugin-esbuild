@@ -58,7 +58,7 @@ eleventyConfig.addPlugin(pluginEsbuild, {
 ```
 It's also possible to specify which `loader` to use and which `jsxFactory`.
 
-## Bouns
+## Bonus
 
 It also comes with a shortcode:
 
@@ -79,7 +79,7 @@ Get your esbuild on in templates with a shortcode:
 {{/javascript}}`
 ```
 
-## Bouns Bouns
+## Bonus Bonus
 
 It also comes with a transform:
 
