@@ -47,9 +47,9 @@ const esBuildPlugin = (
       // return an empty object if no enteries
       eleventyConfig.addGlobalData("esbuild", {});
     }
-    console.log(`No js targets found.`);
+    console.log(`No js entryPoints found.`);
     console.log(
-      `Plugin expects data to be in the shape: { targets: name: "path/to/file.js"}`
+      `Plugin expects data to be in the shape: { entryPoints: name: "path/to/file.js"}`
     );
     return;
   }
