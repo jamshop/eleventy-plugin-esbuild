@@ -1,7 +1,13 @@
 {
   "name": "@jamshop/eleventy-plugin-esbuild",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
+  "repository": "jamshop/eleventy-plugin-esbuild",
+  "author": {
+    "name": "Mike Riethmuller",
+    "email": "mike@madebymike.com.au",
+    "url": "https://madebymike.com.au"
+  },
   "license": "MIT",
   "scripts": {
     "test": "ava --verbose"
